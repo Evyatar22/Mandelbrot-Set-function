@@ -1,19 +1,22 @@
+using System;
 using CodeMonkey.Utils;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class AutoAxis : MonoBehaviour
 {
     #region Data
+
     [SerializeField] private TMP_Text axisText;
-    [SerializeField] private Transform CanvasPerent;
+    [SerializeField] private Canvas CanvasParent;
     [SerializeField] private RectTransform XTampPrfab;
 
-    [SerializeField] private RectTransform RedCircle;
-    [SerializeField] private RectTransform BlackCircle;
+    [SerializeField] private MoveRed RedCircle;
+    [SerializeField] private MoveBlack BlackCircle;
 
     public int itarations = 50;
     public int AmountOfString = 10;
@@ -24,262 +27,250 @@ public class AutoAxis : MonoBehaviour
     public bool animated = false;
     public float deltaTime;
     private bool moved = false;
-    private List<GameObject> AllCircles = new List<GameObject>();
-    private List<GameObject> AllWires = new List<GameObject>();
+    private readonly List<Circle> AllCircles = new List<Circle>();
+    private readonly List<Wire> AllWires = new List<Wire>();
+
+    private RectTransform canvasRectTransform;
 
     #endregion
 
     #region setup
-    private void Start()
+
+    private enum Axis
     {
-        MoveBlack.HasMoved += HasMoved;
-        MoveBlack.HasStoped += HasStoped;
-
-        MoveRed.HasMoved += HasMoved;
-        MoveRed.HasStoped += HasStoped;
-
-        StartCircles();
-        CrateAxis(true);
-        CrateAxis(false);
-
+        X,
+        Y,
     }
-    private void CrateAxis(bool Y_True)
+
+    private void Awake()
     {
+        canvasRectTransform = CanvasParent.GetComponent<RectTransform>();
 
-        float xwid = CanvasPerent.gameObject.GetComponent<RectTransform>().sizeDelta.x;
-        float ywid = CanvasPerent.gameObject.GetComponent<RectTransform>().sizeDelta.y;
+        SetupCircles();
+        CrateAxis(Axis.X);
+        CrateAxis(Axis.Y);
+    }
 
-        if (Y_True)
+    private void CrateAxis(Axis axis)
+    {
+        var sizeDelta = canvasRectTransform.sizeDelta;
+        
+        var xwid = sizeDelta.x;
+        var ywid = sizeDelta.y;
+
+        switch (axis)
         {
-            GameObject YAxis = new GameObject("YAxis", typeof(Image));
-            YAxis.transform.SetParent(CanvasPerent);
-            RectTransform YAxisTr = YAxis.GetComponent<RectTransform>();
+            case Axis.X:
+                var xAxis = new GameObject("XAxis");
+                xAxis.transform.SetParent(CanvasParent.transform);
 
-            Quaternion rotaion = Quaternion.Euler(0f, 0f, 90f);
-            YAxisTr.rotation = rotaion;
-            YAxisTr.anchoredPosition = new Vector2(0, 0);
-            YAxisTr.sizeDelta = new Vector2(0.01f, xwid);
-            YAxis.GetComponent<Image>().color = Color.black;
+                var xAxisTr = xAxis.AddComponent<RectTransform>();
+                xAxisTr.anchoredPosition = new Vector2(0, 0);
+                xAxisTr.sizeDelta = new Vector2(0.01f, ywid);
+                xAxis.AddComponent<Image>().color = Color.black;
 
-            CrateText(true);
-        }
-        else
-        {
-            GameObject XAxis = new GameObject("XAxis", typeof(Image));
-            XAxis.transform.SetParent(CanvasPerent);
+                CrateText(Axis.X);
+                break;
 
-            RectTransform XAxisTr = XAxis.GetComponent<RectTransform>();
-            XAxisTr.anchoredPosition = new Vector2(0, 0);
-            XAxisTr.sizeDelta = new Vector2(0.01f, ywid);
-            XAxis.GetComponent<Image>().color = Color.black;
+            case Axis.Y:
+                var yAxis = new GameObject("YAxis");
+                yAxis.transform.SetParent(CanvasParent.transform);
+                var yAxisTr = yAxis.AddComponent<RectTransform>();
 
-            CrateText(false);
+                var rotation = Quaternion.Euler(0f, 0f, 90f);
+                yAxisTr.rotation = rotation;
+                yAxisTr.anchoredPosition = new Vector2(0, 0);
+                yAxisTr.sizeDelta = new Vector2(0.01f, xwid);
+                yAxis.AddComponent<Image>().color = Color.black;
+
+                CrateText(Axis.Y);
+                break;
         }
     }
 
     //crate text for x Axis, y
-    private void CrateText(bool Y_True)
+    private void CrateText(Axis axis)
     {
-        if (Y_True)
+        switch (axis)
         {
-            for (int i = 0; i < AmountOfString; i++)
-            {
-                GameObject TextIns = Instantiate(axisText.gameObject, Vector3.zero, Quaternion.identity);
-                TextIns.GetComponent<RectTransform>().SetParent(XTampPrfab);
-                TextIns.GetComponent<RectTransform>().anchoredPosition = new Vector2(-0.03f, (i * 0.2f));
-                TextIns.GetComponent<TMP_Text>().text = TextIns.GetComponent<RectTransform>().anchoredPosition.y.ToString();
-
-                if (0.2 * -i != 0)
+            case Axis.X:
+                for (var i = 0; i < AmountOfString; i++)
                 {
-                    GameObject TextInsMinus = Instantiate(axisText.gameObject, Vector3.zero, Quaternion.identity);
-                    TextInsMinus.GetComponent<RectTransform>().SetParent(XTampPrfab);
-                    TextInsMinus.GetComponent<RectTransform>().anchoredPosition = new Vector2(-0.03f, (i * -0.2f));
-                    TextInsMinus.GetComponent<TMP_Text>().text = "-" + TextIns.GetComponent<RectTransform>().anchoredPosition.y.ToString();
+                    var textIns = Instantiate(axisText, Vector3.zero, Quaternion.identity);
+                    textIns.rectTransform.SetParent(CanvasParent.transform);
+                    textIns.rectTransform.anchoredPosition = new Vector2(-0.03f, (i * 0.2f));
+                    textIns.text = textIns.rectTransform.anchoredPosition.y.ToString();
 
+                    if (0.2 * -i != 0)
+                    {
+                        var textInsMinus = Instantiate(axisText, Vector3.zero, Quaternion.identity);
+                        textInsMinus.rectTransform.SetParent(CanvasParent.transform);
+                        textInsMinus.rectTransform.anchoredPosition = new Vector2(-0.03f, (i * -0.2f));
+                        textInsMinus.text = "-" + textIns.rectTransform.anchoredPosition.y.ToString();
+                    }
                 }
-            }
 
-            Quaternion Spin = Quaternion.Euler(0, 0, -90f);
-            XTampPrfab.rotation = Spin;
-
-        }
-        else
-        {
-            for (int i = 0; i < AmountOfString; i++)
-            {
-                GameObject TextIns = Instantiate(axisText.gameObject, Vector3.zero, Quaternion.identity);
-                TextIns.GetComponent<RectTransform>().SetParent(CanvasPerent);
-                TextIns.GetComponent<RectTransform>().anchoredPosition = new Vector2(-0.03f, (i * 0.2f));
-                TextIns.GetComponent<TMP_Text>().text = TextIns.GetComponent<RectTransform>().anchoredPosition.y.ToString();
-
-                if (0.2 * -i != 0)
+                break;
+            case Axis.Y:
+                for (var i = 0; i < AmountOfString; i++)
                 {
-                    GameObject TextInsMinus = Instantiate(axisText.gameObject, Vector3.zero, Quaternion.identity);
-                    TextInsMinus.GetComponent<RectTransform>().SetParent(CanvasPerent);
-                    TextInsMinus.GetComponent<RectTransform>().anchoredPosition = new Vector2(-0.03f, (i * -0.2f));
-                    TextInsMinus.GetComponent<TMP_Text>().text = "-" + TextIns.GetComponent<RectTransform>().anchoredPosition.y.ToString();
+                    var textIns = Instantiate(axisText, Vector3.zero, Quaternion.identity);
+                    textIns.rectTransform.SetParent(XTampPrfab);
+                    textIns.rectTransform.anchoredPosition = new Vector2(-0.03f, (i * 0.2f));
+                    textIns.text = textIns.rectTransform.anchoredPosition.y.ToString();
+
+                    if (0.2 * -i != 0)
+                    {
+                        var textInsMinus = Instantiate(axisText, Vector3.zero, Quaternion.identity);
+                        textInsMinus.rectTransform.SetParent(XTampPrfab);
+                        textInsMinus.rectTransform.anchoredPosition = new Vector2(-0.03f, (i * -0.2f));
+                        textInsMinus.text = "-" + textIns.rectTransform.anchoredPosition.y.ToString();
+                    }
                 }
-            }
+
+                var spin = Quaternion.Euler(0, 0, -90f);
+                XTampPrfab.rotation = spin;
+                break;
         }
     }
+
     #endregion
 
     #region Actions
-    private void OnDestroy()
-    {
-        MoveBlack.HasMoved -= HasMoved;
-        MoveBlack.HasStoped -= HasStoped;
 
-        MoveRed.HasMoved -= HasMoved;
-        MoveRed.HasStoped -= HasStoped;
-    }
     public void AddItration()
     {
         itarations += 1;
     }
+
     public void Party()
     {
         hasparty = true;
     }
+
     public void Restart()
     {
         SceneManager.LoadScene(0);
     }
+
+    private void Update()
+    {
+        RedCircle.Animator.enabled = animated;
+        BlackCircle.Animator.enabled = animated;
+    }
+
     private void LateUpdate()
     {
+        moved = RedCircle.IsDragging || BlackCircle.IsDragging || animated;
 
-        if (animated) { moved = true; }
-        if (moved) { updateCircles(); }
+        if (moved)
+        {
+            UpdateCircles();
+        }
+
         if (hasparty)
         {
-            foreach (GameObject game in AllCircles)
+            foreach (var game in AllCircles)
             {
-                game.GetComponent<Image>().color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+                game.Image.color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
             }
-            foreach (GameObject game in AllWires)
+
+            foreach (var game in AllWires)
             {
-                game.GetComponent<Image>().color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+                game.Image.color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
             }
         }
     }
-    private void HasMoved()
-    {
-        moved = true;
-    }
-
-    private void HasStoped()
-    {
-        moved = false;
-    }
-
 
     #endregion
 
     #region Updateing
-    private void updateCircles()
+
+    private void SetupCircles()
     {
-        StartUpdateCircles();
-    }
+        var x = BlackCircle.RectTransform.anchoredPosition.x;
+        var y = BlackCircle.RectTransform.anchoredPosition.y;
+        AllCircles.Add(BlackCircle);
 
-
-    private void StartCircles()
-    {
-        float x = BlackCircle.anchoredPosition.x;
-        float y = BlackCircle.anchoredPosition.y;
-        AllCircles.Add(BlackCircle.gameObject);
-
-        for (int i = 1; i < itarations; i++)
+        for (var i = 1; i < itarations; i++)
         {
-            Vector2 RedCircleVec2 = RedCircle.anchoredPosition;
-            Vector2 LastCircleVec2 = AllCircles[i - 1].GetComponent<RectTransform>().anchoredPosition;
-            GameObject Circle = Instantiate(BlackCircle.gameObject, Vector3.zero, Quaternion.identity);
+            var redCircleVec2 = RedCircle.RectTransform.anchoredPosition;
+            var lastCircleVec2 = AllCircles[i - 1].RectTransform.anchoredPosition;
+            var circle = Instantiate(BlackCircle, Vector3.zero, Quaternion.identity);
 
-            Circle.transform.SetParent(CanvasPerent);
-            AllCircles.Add(Circle);
+            circle.transform.SetParent(CanvasParent.transform);
+            AllCircles.Add(circle);
 
-            x = Mathf.Pow(x, 2);
-            x -= Mathf.Pow(LastCircleVec2.y, 2);
-            x += RedCircleVec2.x;
+            x = Mathf.Clamp(Mathf.Pow(x, 2), -Screen.width, Screen.width);
+            x = Mathf.Clamp(x - Mathf.Pow(lastCircleVec2.y, 2), -Screen.width, Screen.width);
+            x = Mathf.Clamp(x + redCircleVec2.x, -Screen.width, Screen.width);
 
-            y = (2 * LastCircleVec2.x
-                * LastCircleVec2.y) + RedCircleVec2.y;
+            y = Mathf.Clamp((2 * lastCircleVec2.x * lastCircleVec2.y) + redCircleVec2.y, -Screen.width, Screen.width);
 
-            Circle.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+            circle.RectTransform.anchoredPosition = new Vector2(x, y);
 
             if (HasWire)
             {
-                 GameObject wire = GenrateWireStart(LastCircleVec2
-               , Circle.GetComponent<RectTransform>().anchoredPosition);
+                var wire = GenerateWire(lastCircleVec2, circle.RectTransform.anchoredPosition);
 
                 AllWires.Add(wire);
             }
-
         }
-
     }
 
-    private void StartUpdateCircles()
+    private void UpdateCircles()
     {
-        float x = BlackCircle.anchoredPosition.x;
-        float y = BlackCircle.anchoredPosition.y;
-        for (int i = 1; i < itarations; i++)
+        var x = BlackCircle.RectTransform.anchoredPosition.x;
+
+        for (var i = 1; i < itarations; i++)
         {
-            Vector2 RedCircleVec2 = RedCircle.anchoredPosition;
-            Vector2 LastCircleVec2 = AllCircles[i - 1].GetComponent<RectTransform>().anchoredPosition;
-            RectTransform ICircle = AllCircles[i].GetComponent<RectTransform>();
+            var redCircleVec2 = RedCircle.RectTransform.anchoredPosition;
+            var lastCircleVec2 = AllCircles[i - 1].RectTransform.anchoredPosition;
+            var circle = AllCircles[i].RectTransform;
 
+            x = Mathf.Clamp(Mathf.Pow(x, 2), -Screen.width, Screen.width);
+            x = Mathf.Clamp(x - Mathf.Pow(lastCircleVec2.y, 2), -Screen.width, Screen.width);
+            x = Mathf.Clamp(x + redCircleVec2.x, -Screen.width, Screen.width);
 
-            x = Mathf.Pow(x, 2);
-            x -= Mathf.Pow(LastCircleVec2.y, 2);
-            x += RedCircleVec2.x;
+            var y = Mathf.Clamp((2 * lastCircleVec2.x * lastCircleVec2.y) + redCircleVec2.y, -Screen.width, Screen.width);
 
-            y = (2 * LastCircleVec2.x
-                * LastCircleVec2.y) + RedCircleVec2.y;
-
-            ICircle.anchoredPosition = new Vector2(x, y);
+            circle.anchoredPosition = new Vector2(x, y);
             if (HasWire)
             {
-                
-                  GenrateWireUpdate(LastCircleVec2
-                    ,ICircle.anchoredPosition, i);
-                
-                
+                UpdateWire(lastCircleVec2, circle.anchoredPosition, i);
             }
         }
     }
 
-    public GameObject GenrateWireStart(Vector2 NodeA, Vector2 NodeB)
+    private Wire GenerateWire(Vector2 nodeA, Vector2 nodeB)
     {
-        GameObject Connector = new GameObject("connector", typeof(Image));
-        Connector.transform.SetParent(CanvasPerent);
-        RectTransform ConnectorRT = Connector.GetComponent<RectTransform>();
+        var connector = new GameObject("connector").AddComponent<Wire>();
+        connector.transform.SetParent(CanvasParent.transform);
+        connector.Image.color = new Color(0f, 0f, 0f, 0.25f);
 
-        ConnectorRT.anchorMin = new Vector2(0, 0);
-        ConnectorRT.anchorMax = new Vector2(0, 0);
+        var connectorRT = connector.RectTransform;
+        connectorRT.anchorMin = new Vector2(0, 0);
+        connectorRT.anchorMax = new Vector2(0, 0);
 
-        Connector.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.25f);
+        SetWireTransforms(nodeA, nodeB, connector);
 
-        Vector2 dir = (NodeB - NodeA).normalized;
-        float distance = Vector2.Distance(NodeA, NodeB);
-
-        ConnectorRT.sizeDelta = new Vector2(distance, 0.005f);
-
-        ConnectorRT.position = NodeA + dir * distance * .5f;
-
-        ConnectorRT.localEulerAngles = new Vector3(0, 0, UtilsClass.GetAngleFromVectorFloat(dir));
-
-        return Connector;
+        return connector;
     }
 
-    public void GenrateWireUpdate(Vector2 NodeA, Vector2 NodeB, int i)
+    private void UpdateWire(Vector2 nodeA, Vector2 nodeB, int i)
     {
-        RectTransform ConnectorRT = AllWires[i - 1].GetComponent<RectTransform>();
-        Vector2 dir = (NodeB - NodeA).normalized;
-        float distance = Vector2.Distance(NodeA, NodeB);
-        ConnectorRT.sizeDelta = new Vector2(distance, 0.005f);
-        ConnectorRT.position = NodeA + dir * distance * .5f;
-        ConnectorRT.localEulerAngles = new Vector3(0, 0, UtilsClass.GetAngleFromVectorFloat(dir));
+        SetWireTransforms(nodeA, nodeB, AllWires[i - 1]);
     }
+
+    private static void SetWireTransforms(Vector2 nodeA, Vector2 nodeB, Wire wire)
+    {
+        var dir = (nodeB - nodeA).normalized;
+        var distance = Vector2.Distance(nodeA, nodeB);
+        var connectorRT = wire.RectTransform;
+        connectorRT.sizeDelta = new Vector2(distance, 0.005f);
+        connectorRT.position = nodeA + dir * distance * .5f;
+        connectorRT.localEulerAngles = new Vector3(0, 0, UtilsClass.GetAngleFromVectorFloat(dir));
+    }
+
     #endregion
-
 }
