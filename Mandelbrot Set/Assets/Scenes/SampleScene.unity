@@ -228,16 +228,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   axisText: {fileID: 4433542526847848282, guid: 55de974abe827304da65294b2ac5b1c5, type: 3}
-  CanvasPerent: {fileID: 1128029264}
+  CanvasParent: {fileID: 1128029263}
   XTampPrfab: {fileID: 572173663}
-  RedCircle: {fileID: 755358252}
-  BlackCircle: {fileID: 1174830070}
+  RedCircle: {fileID: 755358255}
+  BlackCircle: {fileID: 1174830073}
   itarations: 20
   AmountOfString: 6
   widthOfAxis: 3
   hasparty: 0
   HasWire: 0
-  animated: 1
+  animated: 0
   deltaTime: 0
 --- !u!4 &260191866
 Transform:
@@ -594,7 +594,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c7f074568424854ca3882c841b99e16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  image: {fileID: 755358253}
+  rectTransform: {fileID: 755358252}
   canvas: {fileID: 1128029263}
+  animator: {fileID: 755358257}
 --- !u!58 &755358256
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -817,7 +820,7 @@ GameObject:
   - component: {fileID: 1174830074}
   - component: {fileID: 1174830075}
   m_Layer: 5
-  m_Name: BlackCirlce
+  m_Name: BlackCircle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -892,7 +895,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 305118c5d9eda9d409b7b81a7fd4c1eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  image: {fileID: 1174830071}
+  rectTransform: {fileID: 1174830070}
   canvas: {fileID: 1128029263}
+  animator: {fileID: 1174830075}
 --- !u!58 &1174830074
 CircleCollider2D:
   m_ObjectHideFlags: 0
