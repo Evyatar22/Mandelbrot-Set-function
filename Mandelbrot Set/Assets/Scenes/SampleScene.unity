@@ -224,7 +224,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 260191864}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db204baefbd67184d84281511032e93c, type: 3}
+  m_Script: {fileID: 11500000, guid: 44375c335931be14ab3211a79f32d5c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   axisText: {fileID: 4433542526847848282, guid: 55de974abe827304da65294b2ac5b1c5, type: 3}
@@ -236,7 +236,8 @@ MonoBehaviour:
   AmountOfString: 6
   widthOfAxis: 3
   hasparty: 0
-  HasWire: 1
+  HasWire: 0
+  animated: 1
   deltaTime: 0
 --- !u!4 &260191866
 Transform:
@@ -516,6 +517,7 @@ GameObject:
   - component: {fileID: 755358253}
   - component: {fileID: 755358255}
   - component: {fileID: 755358256}
+  - component: {fileID: 755358257}
   m_Layer: 5
   m_Name: RedCircle
   m_TagString: Untagged
@@ -539,7 +541,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0, y: 0}
+  m_AnchoredPosition: {x: -0.004, y: -0.295}
   m_SizeDelta: {x: 0.0574, y: 0.0568}
   m_Pivot: {x: 0.5, y: 0.49999997}
 --- !u!114 &755358253
@@ -589,7 +591,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 755358251}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9d04d824deb15b409c2ec9b1523f223, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c7f074568424854ca3882c841b99e16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 1128029263}
@@ -609,6 +611,25 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.03
+--- !u!95 &755358257
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755358251}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1adf7b6c80f24244dadffe4f2412ccea, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1017262673
 GameObject:
   m_ObjectHideFlags: 0
@@ -794,6 +815,7 @@ GameObject:
   - component: {fileID: 1174830071}
   - component: {fileID: 1174830073}
   - component: {fileID: 1174830074}
+  - component: {fileID: 1174830075}
   m_Layer: 5
   m_Name: BlackCirlce
   m_TagString: Untagged
@@ -817,7 +839,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.285, y: -0.284}
+  m_AnchoredPosition: {x: -0.196, y: -0}
   m_SizeDelta: {x: 0.0274, y: 0.0268}
   m_Pivot: {x: 0.5, y: 0.49999997}
 --- !u!114 &1174830071
@@ -867,7 +889,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1174830069}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b24ae08a3c186f247b2eaab3d770f13f, type: 3}
+  m_Script: {fileID: 11500000, guid: 305118c5d9eda9d409b7b81a7fd4c1eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 1128029263}
@@ -887,6 +909,25 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.017082714
+--- !u!95 &1174830075
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174830069}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 07adcf4b573bc4047b992e63d5642bc1, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1602261482
 GameObject:
   m_ObjectHideFlags: 0
@@ -944,7 +985,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 3d585f2f37535b74dbb88f5c3c73575e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 485b84283908e2b48b4c1465ff1e3d7b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

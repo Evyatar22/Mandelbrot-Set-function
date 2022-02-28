@@ -21,6 +21,7 @@ public class AutoAxis : MonoBehaviour
     [SerializeField] private bool hasparty = true;
     [SerializeField] private bool HasWire = false;
 
+    public bool animated = false;
     public float deltaTime;
     private bool moved = false;
     private List<GameObject> AllCircles = new List<GameObject>();
@@ -146,8 +147,8 @@ public class AutoAxis : MonoBehaviour
     }
     private void LateUpdate()
     {
-        
-       
+
+        if (animated) { moved = true; }
         if (moved) { updateCircles(); }
         if (hasparty)
         {
